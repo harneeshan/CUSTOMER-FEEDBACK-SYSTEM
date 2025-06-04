@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Feedback Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body data-role="{{ user[4] if user else '' }}">
+    <header class="header">
+        <h1 class="header-title">Customer Feedback Management</h1>
+        <p class="header-subtitle">We value your feedback!</p>
+        {% if user %}
+            <p>Welcome, {{ user[1] }} ({{ user[4] }}) | <a href="{{ url_for('logout') }}">Logout</a>
+            {% if user[4] == 'admin' %}
+                | <a href="{{ url_for('create_form') }}">Create Feedback Form</a>
+            {% endif %}
+            </p>
+        {% endif %}
+    </header>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% if user %}
+            {% if forms %}
+                <div class="card">
+                    <h2 class="card-title">Submit Your Feedback</h2>
+                    <form id="feedbackForm" class="form">
+                        <div class="form-group">
+                            <label for="form_id" class="form-label">Select Feedback Form</label>
+                            <select id="form_id" name="form_id" class="form-input" required>
+                                <option value="" disabled selected>Select a form</option>
+                                {% for form in forms %}
+                                    <option value="{{ form[0] }}">{{ form[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" id="name" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="feedback" class="form-label">Feedback</label>
+                            <textarea id="feedback" class="form-input" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Rating</label>
+                            <div class="star-rating-input">
+                                <input type="radio" name="rating" id="star1" value="1" class="hidden" required>
+                                <label for="star1" class="star-label">★</label>
+                                <input type="radio" name="rating" id="star2" value="2" class="hidden">
+                                <label for="star2" class="star-label">★</label>
+                                <input type="radio" name="rating" id="star3" value="3" class="hidden">
+                                <label for="star3" class="star-label">★</label>
+                                <input type="radio" name="rating" id="star4" value="4" class="hidden">
+                                <label for="star4" class="star-label">★</label>
+                                <input type="radio" name="rating" id="star5" value="5" class="hidden">
+                                <label for="star5" class="star-label">★</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-button">Submit Feedback</button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="card">
+                    <p>No feedback forms available. {% if user[4] == 'admin' %}Create one <a href="{{ url_for('create_form') }}">here</a>.{% endif %}</p>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="card">
+                <p>Please <a href="{{ url_for('login') }}">log in</a> to submit feedback.</p>
+            </div>
+        {% endif %}
+
+        <div class="card">
+            <h2 class="card-title">Feedback List</h2>
+            <div class="table-container">
+                <table class="feedback-table">
+                    <thead>
+                        <tr>
+                            <th>Form Title</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Feedback</th>
+                            <th>Rating</th>
+                            <th>Date</th>
+                            {% if user and user[4] == 'admin' %}
+                                <th>Action</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody id="feedbackTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2025 Customer Feedback Management. All rights reserved.</p>
+    </footer>
+
+    <script src="/static/main.js"></script>
+</body>
+</html>
